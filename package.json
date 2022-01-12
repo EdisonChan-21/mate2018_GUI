@@ -1,0 +1,38 @@
+{
+  "name": "mate2018",
+  "version": "0.1.0",
+  "main": "index.html",
+  "dependencies": {
+    "chart.js": "^2.7.2",
+    "desktop-screenshot": "^0.1.1",
+    "easytimer.js": "^2.2.1",
+    "materialize-css": "^1.0.0-rc.1",
+    "python-shell": "^0.5.0",
+    "serialport": "^6.2.0",
+    "shape-detector": "^0.2.1"
+  },
+  "window": {
+    "icon": "company logo.png",
+    "frame": false,
+    "width": 280,
+    "height": 650,
+    "position": "center",
+    "min_width": 280,
+    "min_height": 650,
+    "max_width": 350,
+    "max_height": 700
+  },
+  "devDependencies": {
+    "nwjs-builder-phoenix": "^1.14.6"
+  },
+  "build": {
+    "nwVersion": "0.30.3"
+  },
+  "scripts": {
+    "dist": "build --tasks win-x86,win-x64,linux-x86,linux-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+    "start": "run --tasks win-x64 --mirror https://dl.nwjs.io/ ."
+  },
+  "webkit": {
+    "plugin": true
+  }
+}

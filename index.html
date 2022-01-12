@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Uprising</title>
+  <link href="/fontawesome-free-5.1.0-web/css/all.css" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css"  media="screen,projection"/>
+  <style>
+  .top-titlebar {
+  position: relative;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 24px;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+body{
+  color:white;
+  text-align : center;
+  background-image: url(bg.jpg);
+  background-size: percentage;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.gaugeContainer{
+    width: 100%;
+    text-align: center;
+    margin: 0 auto 0 auto;
+
+}
+.input-field label {
+     color: #fff;
+   }
+/* label underline focus color */
+.input-field input[type=text]:focus {
+  border-bottom: 1px solid #fff;
+  box-shadow: 0 1px 0 0 #fff;
+}
+/* label focus color */
+.input-field input[type=text]:focus + label {
+  color: #fff;
+}
+xmp { white-space: pre-wrap }
+  </style>
+</head>
+
+<body>
+  <div class="top-titlebar" id:"top-titlebar" >
+    <div style="width:80%;height:100%;float:left">
+      <i id="serialCircle" class="fas fa-circle" style="font-size:10px;float:left;padding:6px;color:Crimson"></i>
+      <span style="float:left">Serial</span>
+      <i id="socketCircle" class="fas fa-circle" style="font-size:10px;float:left;padding:6px;color:Crimson"></i>
+      <span style="float:left">Socket</span>
+      <i id="wifi" class="white-text fas fa-wifi" style="font-size:10px;float:left;padding:6px;color:Crimson"></i>
+      <i id="bluetooth" class="white-text fab fa-bluetooth-b" style="font-size:12px;float:left;padding:6px;color:Crimson"></i>
+    </div>
+    <div style="height:100%;">
+      <i id="windowClose" onclick="windowClose()" class="fas fa-times" style="font-size:10px;float:right;padding:6px;-webkit-app-region: no-drag;"></i>
+      <i id="windowMinimize" onclick="windowMinimize()" class="fas fa-window-minimize" style="font-size:10px;float:right;padding:6px;-webkit-app-region: no-drag;"></i>
+    </div>
+  </div>
+  <div class="row" style="margin-bottom:0">
+    <div class="col s3" style="padding:0 0 0 .75rem">
+      <button onclick="countDown()" value="Start" id="countDownBtn" class="btn-floating btn-large waves-effect waves-light teal" style="top:10px;opacity:1;font-size: 13px;">Start</button>
+    </div>
+    <div class="col s6">
+      <div id="countdownTimer" style="top:2px">
+        <div id="countdownTime" style="font-size: 50px;top:2px;font-weight:400">
+        <span class="minutes"></span>:<span class="seconds"></span>
+    </div>
+    </div>
+    </div>
+    <div class="col s3" style="padding:0 .75rem 0 0">
+      <button onclick="resetCountdown()" value="Reset" id="resetButton" class="btn-floating btn-large waves-effect waves-light grey darken-2" style="top:10px;opacity:0.5;font-size: 13px;">Reset</button>
+    </div>
+  </div>
+  <div class="row" style="margin-bottom:0">
+    <div class="input-field col offset-s1 s5" >
+      <select class="browser-default" id="selectNumber" onchange="changePort()" style="height:auto">
+        <option value="null" disabled selected>Port</option>
+      </select>
+    </div>
+    <div class="col s5 " id="portSelector">
+      <button onclick="connect()" type="button" id="connectPortBtn" class="waves-effect waves-light btn-small" style="margin:14px 0;width:100%;font-size: 12px;padding:0;">Connect</button>
+    </div>
+  </div>
+
+  <div class="row"style="margin-bottom:0">
+    <div class="input-field col s12" style="margin:0;position:absolute">
+      <div id="cameraName" class="waves-effect waves-light" style="font-weight:100;font-size:16px">Camera</div>
+    </div>
+
+    <div class="input-field col s4" style="margin:0;padding:0">
+      <span>G1</span>
+      <div class="switch">
+    <label>
+      <input id="G1" type="checkbox">
+      <span class="lever"></span>
+    </label>
+    </div>
+    <span>G2</span>
+    <div class="switch">
+  <label>
+    <input id="G2" type="checkbox">
+    <span class="lever"></span>
+  </label>
+  </div>
+    </div>
+    <div class="input-field col s4" style="margin:0;padding:0">
+      <div id="gauge" data-value="null" style="width:100px; height:100px;display:inline-block"></div>
+    </div>
+    <div class="input-field col s4" style="margin:0;padding:0;">
+      <span>R</span>
+      <div class="switch">
+    <label>
+      <input id="R" type="checkbox">
+      <span class="lever"></span>
+    </label>
+    </div>
+    <span>B</span>
+    <div class="switch">
+  <label>
+    <input id="B" type="checkbox">
+    <span class="lever"></span>
+  </label>
+    </div>
+  </div>
+  </div>
+  <!-- <div>
+    <img src="companyLogo2.png" height="60" width="250">
+  </div> -->
+  <div class="row" style="margin-bottom:0">
+    <div class="col s5">
+      <div style="margin:2px">
+        <div><span>Voltage:</span><span id="voltage"></span></div>
+        <div><span>X:</span><span id="xAngle"></span></div>
+        <div><span>Y:</span><span id="yAngle"></span></div>
+        <div><span>Count:</span><span id="count"></span></div>
+      </div>
+
+    </div>
+
+    <div class="col s7">
+      <!-- <div class="card transparent" style="height:120px;width:160px">
+       <div class="card-image">
+         <img src="companyLogo2.png" style="display: block; margin-left:auto;margin-right:auto;top:40px">
+         <span class="card-title red-text" style=""></span>
+       </div>
+     </div> -->
+     <div>
+     <button onclick="imageProcess()" value="processStart" id="imageProcessBtn" class="btn-small waves-effect waves-light teal" style="opacity:1;font-size: 12px;margin:5px;width:90px;">Image</button>
+   </div>
+   <div>
+      <button onclick="distanceMeasure()" id="distanceMeasureBtn" class="btn-small waves-effect waves-light teal" style="opacity:1;font-size: 12px;margin:5px;width:90px;">Measure</button>
+    </div>
+    </div>
+</div>
+ <div class="row" style="height:175px;margin-bottom:0">
+   <div id="graph" class="col s12" >
+     <canvas id="myChart" height="200px"></canvas>
+   </div>
+  <!-- <div id="web" class="col s12 black-text" style="display:inline-block;overflow-y: auto;"> -->
+<div class="row" style="height:175px;margin-bottom:0">
+  <div id="manual" class="col s12" >
+    <div class="input-field">
+    <input id="plotData" type="text">
+    <label for="plotData">Plot Data</label>
+  </div>
+  <button onclick="plotData()" id="dataPlotBtn" class="btn-small waves-effect waves-light teal" style="opacity:1;font-size: 12px;margin:5px;width:90px;">Plot</button>
+  </div>
+  </div>
+ <footer>
+   <div class="row">
+      <div class="col s12">
+        <ul class="tabs transparent">
+          <li class="tab col s4"><a class="active" href="#graph">Graph</a></li>
+          <!-- <li class="tab col s4"><a href="#web">Web</a></li> -->
+          <li class="tab col s4"><a href="#manual">Manual</a></li>
+        </ul>
+      </div>
+    </div>
+</footer>
+<script src="jquery-3.3.1.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/script.js"></script>
+<script src="plugins/justgage-1.2.2/raphael-2.1.4.min.js"></script>
+<script src="plugins/justgage-1.2.2/justgage.js"></script>
+<script type="text/javascript" src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+<script src="plugins/justgage-1.2.2/justgage.js"></script>
+<script src="node_modules/chart.js/dist/Chart.min.js"></script>
+<script>
+// Document constructor
+$(document).ready(function(){
+    $('select').formSelect();
+    $('.tabs').tabs();
+    refreshPort();
+    portCheck();
+  });
+
+// initial variable
+var wifiDataKeepUpdate = true;
+var newWifiData = "";
+var receivedData4000 = ""
+var receivedData4001 = ""
+var motorMapping = [[1,2,3,6],["G1","G2","R","B"]]
+var camPastData = [null,null,null,null,null,null,null,null];
+var camMapping = [[4,0,6,1],["Front","Left","Right","Back"]];
+var camReverse = [1,5,6];
+var camGage = new JustGage({
+        id: "gauge",
+        min: 0,
+        max: 180,
+        titlePosition :"above",
+        valueFontColor:"white",
+        labelFontColor:"white",
+        titleFontColor:"white",
+      });
+var countDownSeconds = 0;
+var countDownMinutes = 15;
+var net = require('net');
+var client1 = new net.Socket();
+var client2 = new net.Socket();
+var portName = [];
+var selectedPort = null;
+var cachePort = null
+var portConnected = false;
+var socket1Connected = false;
+var socket2Connected = false;
+var allSocketConnected = false;
+var wifiData = "";
+var wifiDataArray = [];
+var serialport = require("serialport");
+var SerialPort = serialport.SerialPort;
+var util = require("util"), repl = require("repl");
+// var wifiData = "<h1>MATE 2018 SEISMOGRAPH STATUS</h1>"+"Voltage="+"5.00"+" Xangle="+"4.00"+" Yangle="+"4.00"+" Count="+"1.00"+"</p>DATA: 0, 4.4, -4.3, 0, 0, 6.8, -7, 0, 0, 1.6, -1.6, 0, 0, 6.3, -6.4, 0";
+// get the system platform using node.js
+var Timer = require('easytimer.js');
+var timer = new Timer();
+var gui = require("nw.gui");
+var screenshot = require('desktop-screenshot');
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'line',
+    // The data for our dataset
+    data: {
+        datasets: [{
+            borderColor: 'rgb(255, 99, 132)',
+            data: wifiDataArray,
+        }]
+    },
+
+    // Configuration options go here
+    options: {
+      responsive: true,
+      title: {
+          display: true,
+          text: 'Time',
+          fontFamily:" Roboto, Helvetica, Arial, sans-serif",
+          fontSize:'15',
+      },
+      legend: {
+            display: false,
+        },
+      scales: {
+            xAxes: [{
+                labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+                ticks: {
+                  callback: function(dataLabel, index) {
+              // Hide the label of every 2nd dataset. return null to hide the grid line too
+              return index % 2 === 1 ? dataLabel : '';
+            },
+            beginAtZero: true
+                }
+            }],
+            yAxes: [{
+            ticks: {
+            }
+        }]
+      }
+    }
+});
+var PythonShell = require('python-shell');
+
+$('#webData').html(String(wifiData));
+$('#countdownTimer .seconds').html(String(countDownSeconds).padStart(2,0));
+$('#countdownTimer .minutes').html(String(countDownMinutes).padStart(2,0));
+function countDown(){
+  var button = document.getElementById("countDownBtn");
+  if (button.value=="Start") {
+    button.value = "Pause";
+    $("#countDownBtn").html('Pause');
+    $("#countDownBtn").toggleClass('teal');
+    $("#countDownBtn").toggleClass('deep-orange darken-3');
+    $("#resetButton").css('opacity', '1')
+    timer.start({countdown: true, startValues: {seconds: this.countDownSeconds, minutes:this.countDownMinutes}, precision: 'seconds'});
+    timer.addEventListener('secondsUpdated', function (e) {
+        $('#countdownTimer .minutes').html(timer.getTimeValues().minutes.toString().padStart(2,0));
+        $('#countdownTimer .seconds').html(timer.getTimeValues().seconds.toString().padStart(2,0));
+    });
+    timer.addEventListener('targetAchieved', function (e) {
+        $("#resetButton").addClass('pulse');
+    });
+  }
+  else {
+    button.value = "Start";
+    $("#countDownBtn").html('Start');
+    $("#countDownBtn").toggleClass('teal');
+    $("#countDownBtn").toggleClass('deep-orange darken-3');
+    timer.pause();
+  }
+}
+function resetCountdown(){
+    var button = document.getElementById("countDownBtn");
+    timer.stop();
+    $("#resetButton").removeClass('pulse');
+    $("#resetButton").css('opacity', '0.5');
+    $('#countdownTimer .seconds').html(String(countDownSeconds).padStart(2,0));
+    $('#countdownTimer .minutes').html(String(countDownMinutes).padStart(2,0));
+    if (button.value=="Pause") {
+      button.value = "Start";
+      $("#countDownBtn").html('Start');
+      $("#countDownBtn").toggleClass('teal');
+      $("#countDownBtn").toggleClass('deep-orange darken-2');
+    }
+}
+function refreshPort(){
+  serialport.list(function (err, ports) {
+    this.portName = [];
+    ports.forEach(function(port) {
+      this.portName.push(port.comName)
+    });
+    if((this.portName.indexOf(this.selectedPort)==-1)&&(portConnected == true)){
+      $("#connectPortBtn").html('CONNECT')
+      $("#connectPortBtn").removeClass('disabled');
+      portConnected = false;
+      camGage.refresh(null);
+      document.getElementById("serialCircle").style["color"] = "Crimson";
+      cachePort = selectedPort;
+      selectedPort = null;
+    }
+    $("#selectNumber option[value!='null']").each(function() {
+    $(this).remove();
+    });
+    var select = document.getElementById("selectNumber");
+    for(var i = 0; i < this.portName.length; i++) {
+        var opt = this.portName[i];
+        var el = document.createElement("option");
+        el.textContent = opt;
+        el.value = opt;
+        select.appendChild(el);
+        if(el.value==this.selectedPort){
+          el.selected = true
+        }
+    }
+  });
+}
+function changePort(){
+  var e = document.getElementById("selectNumber");
+  this.selectedPort = e.options[e.selectedIndex].value;
+}
+function connectSocket(){
+  client1.connect(4000, '192.168.2.2', function() {
+  	console.log('Socket Port 4000 Connected');
+    socket1Connected = true;
+    checkSocketConnection()
+  });
+
+  client1.on('data', function(data) {
+    receivedData4000 = String(data)
+    console.log(client1.bytesRead);
+  	console.log('Socket 4000 Received: ' + receivedData4000);
+    wifiData+=receivedData4000;
+    if(wifiDataKeepUpdate){
+      wifiDataUpdate()
+    }
+  });
+
+  client1.on('close', function() {
+  	console.log('Connection closed');
+    document.getElementById("socketCircle").style["color"] = "Crimson";
+    socketConnected1=false;
+    checkSocketConnection()
+  });
+
+  client2.connect(4001, '192.168.2.2', function() {
+  	console.log('Socket Port 4001 Connected');
+    socket2Connected = true;
+    checkSocketConnection()
+  });
+
+  client2.on('data', function(data) {
+    receivedData4001 = String(data);
+    console.log(client2.bytesRead);
+  	console.log('Socket 4001 Received: ' + receivedData4001);
+    wifiData+=receivedData4001;
+    if(wifiDataKeepUpdate){
+      wifiDataUpdate()
+    }
+  });
+
+  client2.on('close', function() {
+  	console.log('Connection closed');
+    document.getElementById("socketCircle").style["color"] = "Crimson";
+    socket2Connected=false;
+    checkSocketConnection()
+  });
+}
+function checkSocketConnection(){
+  if(socket1Connected&&socket2Connected){
+    document.getElementById("socketCircle").style["color"] = "LimeGreen";
+    allSocketConnected=true;
+  }else if(socket1Connected||socket2Connected){
+    document.getElementById("socketCircle").style["color"] = "yellow";
+    allSocketConnected=false;
+  }else{
+    document.getElementById("socketCircle").style["color"] = "Crimson";
+    allSocketConnected=false;
+  }
+}
+
+function connectPort(){
+  console.log('selectedPort: ', this.selectedPort);
+  var port = new serialport(this.selectedPort, {baudRate: 115200 }, function (err) {
+  if (err) {
+    document.getElementById("serialCircle").style["color"] = "yellow";
+    return console.log('Error: ', err.message);
+  }
+  });
+
+  port.write('main screen turn on', function(err) {
+  if (err) {
+    return console.log('Error on write: ', err.message);
+    document.getElementById("serialCircle").style["color"] = "Crimson";
+  }
+});
+    // Switches the port into "flowing mode"
+  port.on('data', function (data) {
+    console.log('Data:', data);
+    portConnected = true;
+    document.getElementById("serialCircle").style["color"] = "transparent";
+    setTimeout(function() {
+    document.getElementById("serialCircle").style["color"] = "LimeGreen";
+    }, 50);
+    var dataArray = Array.from(data)
+    if(dataArray[0]==193){
+      var camData = Array.from(data).splice(1,8);
+      var onChangeCam = onChangeCamData(camData)
+      if(onChangeCam!=null){
+        camGage.refresh(camData[onChangeCam]);
+        if(camReverse.indexOf(onChangeCam)>-1){
+          camGage.refresh(180-camData[onChangeCam]);
+        }else{
+          camGage.refresh(camData[onChangeCam]);
+        }
+        if(camMapping[0].indexOf(onChangeCam)>-1){
+          $("#cameraName").html(camMapping[1][camMapping[0].indexOf(onChangeCam)]);
+        }else{
+          $("#cameraName").html("Camera");
+        }
+      }
+    }
+    else if (dataArray[0]==209) {
+      var motorData = Array.from(data).splice(1,7);
+      for (var i = 0; i < 4; i++){
+        if(motorData[motorMapping[0][i]]!=0){
+          $('#' + motorMapping[1][i]).prop('checked', true);
+        }else{
+          $('#' + motorMapping[1][i]).prop('checked', false);
+        }
+      }
+    }
+    console.log('camData:', camData);
+    client1.write(data, function() {
+    });
+    client2.write(data, function() {
+    });
+    if(allSocketConnected){
+      $("#connectPortBtn").addClass('disabled');
+      $("#connectPortBtn").html('CONNECTED');
+    }
+  });
+
+  // Read data that is available but keep the stream from entering "flowing mode"
+  port.on('readable', function () {
+    var data = port.read();
+    console.log('Data:', data);
+  });
+}
+function connect(){
+  if(selectedPort!=null){
+    $("#connectPortBtn").html('<div class="preloader-wrapper active" style="width:24px;height:24px;margin-top:4px"><div class="spinner-layer" style="border-color: white;"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div>')
+    return new Promise(function (resolve, reject) {
+      if(portConnected){
+        connectSocket();
+      }else if(allSocketConnected){
+        connectPort();
+      }else{
+        connectSocket();
+        connectPort();
+      }
+      resolve();
+    }).then(function () {
+      setTimeout(function(){
+        if(portConnected&&allSocketConnected){
+          $("#connectPortBtn").addClass('disabled');
+          $("#connectPortBtn").html('CONNECTED');
+        }else{
+          $("#connectPortBtn").html('CONNECT');
+        }
+      },2000);
+  });
+}else{
+  M.toast({html: 'Please select a port'})
+}
+}
+
+function portCheck() {
+    setTimeout(function () {
+        refreshPort();
+        if(this.portName.indexOf(this.cachePort)!=-1){
+          selectedPort = cachePort;
+          cachePort = null;
+          connect()
+        }
+        portCheck();
+    }, 1000);
+}
+
+function onChangeCamData(camData){
+  for(var i = 0; i < 8; i++) {
+    if(camData[i]!=camPastData[i]){
+      console.log(camPastData)
+      if(camPastData[i]==null){
+        camPastData=camData;
+        return camMapping[0][0];
+      }else{
+        camPastData=camData;
+        return i;
+      }
+    }
+  }
+  camPastData=camData;
+  return null;
+}
+
+function windowClose(){
+  window.close();
+}
+function windowMinimize(){
+  gui.Window.get().minimize();
+}
+
+function imageProcess(){
+  $("#imageProcessBtn").html('<div class="preloader-wrapper active" style="width:24px;height:24px;margin-top:4px"><div class="spinner-layer" style="border-color: white;"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div>')
+   wifiData += "<h1>MATE 2018 SEISMOGRAPH STATUS</h1>"+"Voltage="+"5.00"+" Xangle="+"4.00"+" Yangle="+"4.00"+" Count="+"1.00"+"</p>DATA: 0, 4.4, -4.3, 0, 0, 6.8, -7, 0, 0, 1.6, -1.6, 0, 0, 6.3, -6.4, 0<h1>MATE 2018 SEISMOGRAPH STATUS</h1>"+"Voltage="+"5.00"+" Xangle="+"1.00"+" Yangle="+"1.00"+" Count="+"1.00"+"</p>DATA: 0, 4.4, -4.3, 0, 0, 6.8, -7, 0, 0, 1.6, -1.6, 0, 0, 6.3, -6.4, 0";
+  var pyshell = new PythonShell('python/screenRecord.py');
+  wifiDataUpdate();
+  pyshell.on('message', function (message) {
+    // received a message sent from the Python script (a simple "print" statement)
+    console.log(message);
+  });
+
+  // end the input stream and allow the process to exit
+  pyshell.end(function (err,code,signal) {
+    if (err) throw err;
+    console.log('The exit code was: ' + code);
+    console.log('The exit signal was: ' + signal);
+    console.log('finished');
+    $("#imageProcessBtn").html('Image');
+  });
+}
+
+function distanceMeasure(){
+  var pyshell = new PythonShell('python/disMea.py');
+  $("#distanceMeasureBtn").html('<div class="preloader-wrapper active" style="width:24px;height:24px;margin-top:4px"><div class="spinner-layer" style="border-color: white;"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div>')
+  pyshell.on('message', function (message) {
+    // received a message sent from the Python script (a simple "print" statement)
+    console.log(message);
+  });
+
+  // end the input stream and allow the process to exit
+  pyshell.end(function (err,code,signal) {
+    if (err) throw err;
+    console.log('The exit code was: ' + code);
+    console.log('The exit signal was: ' + signal);
+    console.log('finished');
+    $("#distanceMeasureBtn").html('Measure');
+  });
+}
+
+function wifiDataUpdate(){
+  $('#webData').html(String(wifiData));
+  var voltage = wifiData.slice(wifiData.lastIndexOf("Voltage=")+8,wifiData.lastIndexOf("Xangle="));
+  var xAngle = wifiData.slice(wifiData.lastIndexOf("Xangle=")+7,wifiData.lastIndexOf("Yangle="));
+  var yAngle = wifiData.slice(wifiData.lastIndexOf("Yangle=")+7,wifiData.lastIndexOf("Count="));
+  var count = wifiData.slice(wifiData.lastIndexOf("Count=")+6,wifiData.lastIndexOf("</p>"));
+  // console.log((wifiData.match(/,/g) || []).length)
+  // if((wifiData.match(/,/g) || []).length%15==0){
+  // if(wifiData.lastIndexOf("DATA:")>wifiData.lastIndexOf("<h1>")){
+  //   var res = wifiData.slice(wifiData.lastIndexOf("DATA:")+5);
+  // }else{
+  var res = wifiData.slice(wifiData.lastIndexOf("DATA:")+5,wifiData.lastIndexOf("<h1>"));
+  // }
+  wifiDataArray = JSON.parse("[" + res + "]");
+  console.log("voltage: ",voltage);
+  console.log("xAngle: ",xAngle);
+  console.log("yAngle: ",yAngle);
+  console.log("count: ",count);
+  console.log("res: ",res);
+  console.log("wifiDataArray: ",wifiDataArray);
+  this.chart.data.datasets.forEach((dataset) => {
+        dataset.data=wifiDataArray;
+    });
+    this.chart.update();
+  $("#voltage").html(voltage);
+  $("#xAngle").html(xAngle);
+  $("#yAngle").html(yAngle);
+  $("#count").html(count);
+}
+
+function plotData(){
+  wifiDataKeepUpdate = false;
+  newWifiData = document.getElementById('plotData').value;
+  document.getElementById('plotData').value = "";
+  console.log(newWifiData);
+  wifiDataArray = JSON.parse("[" + newWifiData + "]");
+  this.chart.data.datasets.forEach((dataset) => {
+        dataset.data=wifiDataArray;
+    });
+    this.chart.update();
+}
+// var dgram = require('dgram');
+//
+// var clientSocket = dgram.createSocket('udp4');
+//
+// clientSocket.on('message', function(msg, rinfo){
+//   console.log('recv %s(%d) from server\n', msg, msg.length);
+// });
+//
+// clientSocket.on('error', function(err){
+//   console.log('error, msg - %s, stack - %s\n', err.message, err.stack);
+// });
+//
+// clientSocket.bind(5600);
+
+</script>
+</body>
+</html>
